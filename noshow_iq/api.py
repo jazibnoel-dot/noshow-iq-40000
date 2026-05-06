@@ -6,7 +6,7 @@ from pymongo import MongoClient
 import os
 from dotenv import load_dotenv
 from noshow_iq.model import load_model, predict
-from noshow_iq.preprocess import get_features_and_target
+from noshow_iq.preprocess import get_features_and_target # noqa: F401
 
 load_dotenv()
 
