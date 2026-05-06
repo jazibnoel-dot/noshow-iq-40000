@@ -25,21 +25,11 @@ jobs:
               run: flake8 noshow_iq/ --max-line-length=88 --ignore=E501
 
             - name: Create dummy model for testing
-              # This creates a fake model class that mimics Scikit-Learn
-              # It prevents the 'list object has no attribute predict_proba' error
               run: |
-                  python -c "
-                  import joblib
-                  import numpy as np
-                  class MockModel:
-                      def predict(self, X): return np.array([0])
-                      def predict_proba(self, X): return np.array([[0.8, 0.2]])
-                  joblib.dump(MockModel(), 'noshow_iq/model.joblib')
-                  "
+                  python -c "import joblib; joblib.dump({'is_dummy': True}, 'noshow_iq/model.joblib')"
 
             - name: Run pytest
               env:
-                  # Uses the GitHub Secret for Mongo, or a fallback for testing
                   MONGO_URI: ${{ secrets.MONGO_URI || 'mongodb://localhost:27017/testdb' }}
               run: pytest tests/ -v
 
