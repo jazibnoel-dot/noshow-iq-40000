@@ -11,7 +11,9 @@ from noshow_iq.preprocess import get_features_and_target  # noqa: F401
 load_dotenv()
 
 app = FastAPI()
-client = MongoClient(os.getenv("MONGO_URI"))
+# Provide a local fallback so tests don't crash without an .env file
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
+client = MongoClient(MONGO_URI)
 db = client["noshowiq"]
 predictions_col = db["predictions"]
 training_runs_col = db["training_runs"]
