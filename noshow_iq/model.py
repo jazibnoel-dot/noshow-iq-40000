@@ -48,17 +48,16 @@ def load_model():
 
 
 def predict(model, X):
-    # Check if we are using the dummy model from CI/CD
+    # Check if we are using the dummy model dictionary from earlier attempts
+    # or the MockModel class
     if isinstance(model, dict) and model.get('is_dummy'):
-        # Return fake (Risk Level, Probability, Recommendation)
-        return "Low", 0.2, "No action needed"
+        return "low", 0.2, "Standard procedure"
+
+    prob = float(model.predict_proba(X)[0][1])
+    # prediction variable removed to fix lint error F841
     
-    # Your original real model logic
-    prob = model.predict_proba(X)[0][1]
-    prediction = model.predict(X)[0]
-    
-    risk = "High" if prob > 0.5 else "Low"
-    recommendation = "Follow up" if risk == "High" else "Standard procedure"
+    risk = "high" if prob > 0.5 else "low"
+    recommendation = "Follow up" if risk == "high" else "Standard procedure"
     
     return risk, prob, recommendation
 

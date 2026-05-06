@@ -21,19 +21,24 @@ db = client["noshowiq"]
 predictions_col = db["predictions"]
 training_runs_col = db["training_runs"]
 
+
 # --- FAIL-SAFE MODEL LOADING ---
 def load_model_safe():
     model_path = "noshow_iq/model.joblib"
     if not os.path.exists(model_path):
-        # If file is missing (GitHub CI), return a Mock object with required methods
+        # If file is missing (GitHub CI), return a Mock object
         class MockModel:
-            def predict(self, X): return np.array([0])
-            def predict_proba(self, X): return np.array([[0.8, 0.2]])
+            def predict(self, X):
+                return np.array([0])
+
+            def predict_proba(self, X):
+                return np.array([[0.8, 0.2]])
         return MockModel()
     return joblib.load(model_path)
 
+
 model = load_model_safe()
-# -------------------------------
+
 
 class AppointmentInput(BaseModel):
     age: int
@@ -54,11 +59,12 @@ def health():
 
 @app.post("/predict")
 def predict_endpoint(data: AppointmentInput):
-    # Updated .dict() to .model_dump() to fix Pydantic V2 warnings
     input_dict = data.model_dump()
     X = pd.DataFrame([input_dict])
 
     risk, prob, recommendation = predict(model, X)
+    # Normalize risk to lowercase to match test expectations ("low" instead of "Low")
+    risk = risk.lower()
 
     doc = {
         "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -104,7 +110,6 @@ def stats():
     ]
 
     result = list(predictions_col.aggregate(pipeline))
-
     last_run = training_runs_col.find_one(sort=[("timestamp", -1)])
     last_trained = last_run["timestamp"] if last_run else None
 
