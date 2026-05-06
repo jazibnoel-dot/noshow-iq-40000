@@ -20,6 +20,9 @@ jobs:
       - name: Lint with flake8
         run: flake8 noshow_iq/ --max-line-length=88 --ignore=E501
 
+     - name: Create dummy model for tests
+        run: python -c "import joblib; joblib.dump(lambda x: [0], 'noshow_iq/model.joblib')"
+
       - name: Run pytest
         env:
           MONGO_URI: ${{ secrets.MONGO_URI }}
