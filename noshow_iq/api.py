@@ -52,6 +52,20 @@ class AppointmentInput(BaseModel):
     appt_day_of_week: int
 
 
+@app.get("/")
+def read_root():
+    return {
+        "status": "No-Show IQ API is running",
+        "endpoints": {
+            "predict": "/predict (POST)",
+            "health": "/health (GET)",
+            "stats": "/stats (GET)",
+            "history": "/history (GET)"
+        },
+        "documentation": "/docs"
+    }
+
+
 @app.get("/health")
 def health():
     return {"status": "ok"}
@@ -63,7 +77,7 @@ def predict_endpoint(data: AppointmentInput):
     X = pd.DataFrame([input_dict])
 
     risk, prob, recommendation = predict(model, X)
-    # Normalize risk to lowercase to match test expectations ("low" instead of "Low")
+    # Normalize risk to lowercase to match test expectations
     risk = risk.lower()
 
     doc = {
