@@ -64,3 +64,4 @@ if __name__ == "__main__":
         print("Usage: python smoke_test.py <base_url>")
         sys.exit(1)
     run_tests(sys.argv[1])
+    
